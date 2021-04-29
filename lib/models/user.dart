@@ -2,20 +2,23 @@ class User {
   int userId;
   String name;
   String email;
-  String type;
+  bool isAdmin;
+  String password;
 
   User({
     this.userId,
     this.name,
     this.email,
-    this.type,
+    this.isAdmin,
+    this.password,
   });
 
   factory User.fromJson(Map<String, dynamic> responseData) {
     return User(
         userId: responseData['id'],
-        name: responseData['name'],
+        name: responseData['fullName'],
         email: responseData['email'],
-        type: responseData['type']);
+        isAdmin: responseData['isAdmin'],
+        password: responseData['password']);
   }
 }

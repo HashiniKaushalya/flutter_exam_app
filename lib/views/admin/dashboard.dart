@@ -6,6 +6,7 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,9 +21,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
             color: Colors.white,
           ),
         ),
-        // brightness: Brightness.light,
-        // backgroundColor: Colors.transparent,
-        // elevation: 0,
         leading: Container(
           margin: EdgeInsets.all(15),
           width: 50,
@@ -108,13 +106,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             ),
                             onPressed: () => {
                               Navigator.pushNamed(context, '/dashboardUser')
-                            },
-                            // onPressed: () => {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(builder: (context) => UserView()),
-                            //   )
-                            //},
+                            },                          
                           ),
                         ),
                       ),

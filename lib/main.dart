@@ -1,12 +1,14 @@
 import 'dart:ui';
-
+import 'package:first_project/models/scheduleExam.dart';
+import 'package:first_project/models/user.dart';
+import 'package:first_project/views/user/scheduleExams.dart';
 import 'package:flutter/material.dart';
 import 'package:first_project/views/LoginPage.dart';
 import 'package:first_project/views/SignUpPage.dart';
 import 'package:first_project/views/admin/manageExams.dart';
 import 'package:first_project/views/admin/viewUsers.dart';
-import 'package:first_project/views/user/scheduleExams.dart';
 import 'package:first_project/views/user/viewScheduled.dart';
+import 'models/exam.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,16 +18,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Exam Master',
       debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: MyHomePage(),
       routes: {
-        '/LoginPage': (context) => LoginPage(),
-        '/SignUpPage': (context) => SignUpPage(),
-        '/dashboardAdmin': (context) => AdminView(),
-        '/dashboardUser': (context) => UserView(),
-        '/scheduleExams' : (context) => Shedule(),
-        '/viewScheduled' : (context) => Scheduled(),
+        '/LoginPage': (context) => LoginPage(User()),
+        '/SignUpPage': (context) => SignUpPage(User()),
+        '/dashboardAdmin': (context) => AdminView(Exam()),
+        '/dashboardUser': (context) => UserView(User()),
+        '/scheduleExams': (context) => ScheduleExams(Exam()),
+        '/viewScheduled': (context) => Scheduled(ScheduleExam()),
       },
     );
   }
@@ -61,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Container(
               padding: EdgeInsets.all(80),
-              child: Image.asset('assets/image.jpg'),
+              child: Image.asset('assets/image2.jpg'),
             ),
             SizedBox(
               height: 10,
@@ -70,8 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 50,
               width: MediaQuery.of(context).size.width * 0.8,
               decoration: BoxDecoration(
-                          color: Color(0xfff063057),
-                          borderRadius: BorderRadius.all(Radius.circular(25))),             
+                  color: Color(0xfff063057),
+                  borderRadius: BorderRadius.all(Radius.circular(25))),
               child: InkWell(
                 onTap: openSignUp,
                 child: Center(
@@ -89,7 +95,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Container(
               padding: EdgeInsets.all(30),
-              //child: Image.asset('assets/images.jpg'),
             ),
             SizedBox(
               height: 20,
@@ -98,8 +103,8 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 50,
               width: MediaQuery.of(context).size.width * 0.8,
               decoration: BoxDecoration(
-                          color: Color(0xfff063057),
-                          borderRadius: BorderRadius.all(Radius.circular(25))),
+                  color: Color(0xfff063057),
+                  borderRadius: BorderRadius.all(Radius.circular(25))),
               child: InkWell(
                 onTap: openLogin,
                 child: Center(

@@ -6,7 +6,7 @@ class Logout extends StatelessWidget {
     return Scaffold(
       body: Container(
         child: Center(
-          child: Text("Thank You"),
+          child: Text("Thank You ;-)"),
         ),
       ),
     );

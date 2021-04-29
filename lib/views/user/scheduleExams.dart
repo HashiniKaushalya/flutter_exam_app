@@ -1,116 +1,189 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:first_project/providers/exams.dart';
-import 'package:first_project/providers/sheduleExam.dart';
+import 'dart:convert';
+import 'package:first_project/models/exam.dart';
+import 'package:first_project/models/scheduleExam.dart';
+import 'package:first_project/utils/api_url.dart';
 import 'package:flushbar/flushbar.dart';
+import 'package:flutter/material.dart';
 
-class Shedule extends StatefulWidget {
+class ScheduleExams extends StatefulWidget {
+  final Exam exams;
+  ScheduleExams(this.exams);
   @override
-  _SheduleState createState() => _SheduleState();
+  State<StatefulWidget> createState() => _ScheduleExamsState(exams);
 }
 
-class _SheduleState extends State<Shedule> {
-  ExamProvider exam = new ExamProvider();
-  DateTime selectedDate = DateTime.now();
-  ExamsSheduleProvider examShedule = new ExamsSheduleProvider();
+class _ScheduleExamsState extends State<ScheduleExams> {
+  final Exam exams;
+  _ScheduleExamsState(this.exams);
+  List<Exam> item = List();
+  List<ScheduleExam> scheduleItems = List();
+  List<String> array = [];
+  bool _isLoading = false;
+  DateTime pickedDate;
+
+  String _selectedExam;
+  @override
+  void initState() {
+    super.initState();
+    getScheduledList();
+    _getExamList();
+   // _isLoading = true;
+  }
+
+  _getExamList() async {
+    var res = await AppUrl.getExamList();
+    try {
+      if (res.statusCode == 200) {
+        Iterable listData = json.decode(res.body);
+        setState(() {
+          item = listData.map((e) => Exam.fromJson(e)).toList();
+          _isLoading = true;
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  getScheduledList() async {
+    var res = await AppUrl.getScheduledList();
+    try {
+      if (res.statusCode == 200) {
+        Iterable listData = json.decode(res.body);
+        setState(() {
+          scheduleItems =
+              listData.map((e) => ScheduleExam.fromJson(e)).toList();
+          //_isLoading = true;
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xfff063057),
-        title: Text('Schedule Exam'),
+        title: Text("Add.."),
       ),
       body: Container(
-        child: FutureBuilder<List<dynamic>>(
-          future: exam.getExam(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              //print(_age(snapshot.data[0]));
-              return ListView.builder(
-                  padding: EdgeInsets.all(8),
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return examCard(context, snapshot.data[index]);
-                  });
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+        color: Colors.grey.withOpacity(0.3),
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : Center(
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Text('Choose..'),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                value: _selectedExam,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    _selectedExam = newValue;
+                                    array.add(_selectedExam);
+                                    //_isLoading = false;
+                                  });
+                                  print(_selectedExam);
+                                },
+                                items: item.map((value) {
+                                  return DropdownMenuItem(
+                                    child: new Text(value.name ?? 'Empty'),
+                                    value: value.name,
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _selectedExam == null
+                        ? Text('Select the dropdown value for list to appear.')
+                        : Container(
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: array.length,
+                                itemBuilder: (context, index) {
+                                  return new Card(
+                                    color: Theme.of(context).primaryColor,
+                                    child: Column(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              8.0, 8.0, 8.0, 2.0),
+                                          child: Container(
+                                            height: 70,
+                                            child: new ListTile(
+                                              title: Text(
+                                                array[index],
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                  pickedDate.toString() ??
+                                                      'default'),
+                                              trailing: IconButton(
+                                                icon: Icon(
+                                                  Icons.date_range,
+                                                  color: Color(0xfff063057),
+                                                ),
+                                                onPressed: () {
+                                                  showDatePicker(
+                                                    context: context,
+                                                    initialDate:
+                                                        pickedDate == null
+                                                            ? DateTime.now()
+                                                            : pickedDate,
+                                                    firstDate: DateTime(2001),
+                                                    lastDate: DateTime(2222),
+                                                  ).then((date) {
+                                                    setState(() {
+                                                      pickedDate = date;
+                                                    });
+                                                  });
+                                                  scheduleExams();
+                                                  //Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          ),
+                  ],
+                ),
+              ),
       ),
     );
   }
 
-  Widget examCard(context, snapshot) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Color(0xfff063057),
-          foregroundColor: Colors.white,
-          child: Text(
-            snapshot['id'],
-            style: TextStyle(fontSize: 13.0),
-          ),
+  void scheduleExams() async {
+    var res = await AppUrl.postScheduleExam();
+    if (res.statusCode == 201) {
+      Flushbar(
+        icon: Icon(
+          Icons.warning_outlined,
+          color: Colors.amberAccent,
         ),
-        title: Text(snapshot['name']),
-        subtitle: Text(getTimeString(snapshot['duration'])),
-        trailing: IconButton(
-            icon: Icon(
-              Icons.date_range,
-              color: Color(0xfff063057),
-            ),
-            onPressed: () => _selectDate(context, snapshot)),
-      ),
-    );
-  }
-
-  _selectDate(BuildContext context, selectedExam) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      confirmText: 'SHEDULE',
-      helpText: 'Select a date to shedule the exam',
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
-    );
-    if (picked != null && picked != selectedDate) {
-      print(selectedExam);
-      print(picked);
-      sheduleExam(selectedExam, picked);
+        showProgressIndicator: true,
+        progressIndicatorBackgroundColor: Colors.blue[200],
+        titleText: Text("Success", style: TextStyle(color: Colors.amberAccent)),
+        message: "You have sucessfully scheduled an exam",
+        duration: Duration(seconds: 2),
+      ).show(context).then((value) => getScheduledList());
     }
-    // setState(() {
-    //   selectedDate = picked;
-    // });
-  }
-
-  void sheduleExam(data, sheddate) {
-    var reqBody = {
-      "name": data["name"],
-      "duration": data["duration"],
-      "sheduled_date": sheddate.toString(),
-      "userId": 1
-    };
-    examShedule.sheduleExam(reqBody).then((value) {
-      if (value == 200) {
-        Flushbar(
-          title: "Sheduled Sucessfully",
-          message: "You have sucessfully deleted the exam",
-          duration: Duration(seconds: 2),
-        ).show(context);
-        super.setState(() {});
-      } else {
-        Flushbar(
-          title: "Shedule Unsucessful",
-          message: "An error occured during sheduling.Try Again",
-          duration: Duration(seconds: 2),
-        ).show(context);
-      }
-    });
-  }
-
-  String getTimeString(int value) {
-    final int hour = value ~/ 60;
-    final int minutes = value % 60;
-    return '${hour.toString().padLeft(2, "0")} hours ${minutes.toString().padLeft(2, "0")} minutes';
   }
 }

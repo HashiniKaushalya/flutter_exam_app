@@ -1,6 +1,13 @@
+import 'package:first_project/views/user/mainDrawer.dart';
 import 'package:flutter/material.dart';
+import 'package:first_project/models/user.dart';
+//import 'package:first_project/views/LoginPage.dart';
+//import './mainDrawer.dart';
 
 class UserPage extends StatefulWidget {
+  final User user;
+  UserPage({Key key, @required this.user}) : super(key: key);
+  
   @override
   _UserPageState createState() => _UserPageState();
 }
@@ -20,22 +27,20 @@ class _UserPageState extends State<UserPage> {
             color: Colors.white,
           ),
         ),
-        // brightness: Brightness.light,
-        // backgroundColor: Colors.transparent,
-        // elevation: 0,
         leading: Container(
-          margin: EdgeInsets.all(15),
+          margin: EdgeInsets.all(5),
           width: 50,
           height: 50,
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-          ),
+           child: IconButton(
+             onPressed: () {
+               Navigator.push(context,
+                MaterialPageRoute(builder: (context) => MainDrawer()));
+             },
+             icon: Icon(
+               Icons.menu,
+               color: Colors.white,
+             ),
+           ),
         ),
       ),
       body: Column(
@@ -109,12 +114,6 @@ class _UserPageState extends State<UserPage> {
                             onPressed: () => {
                               Navigator.pushNamed(context, '/viewScheduled')
                             },
-                            // onPressed: () => {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(builder: (context) => UserView()),
-                            //   )
-                            //},
                           ),
                         ),
                       ),
